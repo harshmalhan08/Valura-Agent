@@ -1,0 +1,48 @@
+# =============================================================================
+# Valura AI — Team Lead Assignment — Core Dependencies
+# =============================================================================
+# This is the minimal set we ship. Add what you need; justify additions in your README.
+
+# --- Web framework + streaming ---
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+sse-starlette>=1.8.2       # SSE is required by the assignment; this is the path of least resistance
+httpx>=0.27.0              # async HTTP client + TestClient
+
+# --- Validation ---
+pydantic>=2.7.0
+
+# --- LLM ---
+openai>=1.30.0             # OpenAI Python SDK — structured outputs, streaming
+
+# --- MCP (Model Context Protocol) ---
+# mcp>=0.9.0                 # MCP SDK for Python - Not available on PyPI yet
+# yfmcp will be run via uvx, not installed as a package
+# For now, we'll use the MCP client from the official repo if needed
+
+# --- Database ---
+sqlalchemy>=2.0.23         # ORM for SQLite
+aiosqlite>=0.19.0          # Async SQLite driver
+
+# --- Utilities ---
+python-dotenv>=1.0.0
+loguru>=0.7.2              # Better logging
+
+# --- Market Data ---
+yfinance>=0.2.0            # Underlying data provider (used by yfmcp)
+
+# --- Testing ---
+pytest>=8.2.0
+pytest-asyncio>=0.23.0
+pytest-mock>=3.14.0
+pytest-cov>=4.1.0          # Code coverage
+
+# --- Monitoring ---
+prometheus-client>=0.20.0  # Prometheus metrics
+
+# =============================================================================
+# Optional additions:
+#   - pandas / numpy        — if your portfolio math gets non-trivial
+#   - tenacity              — if you implement retry policies
+#   - cachetools            — if you implement the optional dedupe cache
+# =============================================================================

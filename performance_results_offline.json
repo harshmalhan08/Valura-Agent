@@ -1,0 +1,42 @@
+[
+  {
+    "component": "Safety Guard",
+    "iterations": 2000,
+    "safe_queries": 1000,
+    "harmful_queries": 1000,
+    "mean_latency_ms": 0.054999470710754395,
+    "median_latency_ms": 0.0,
+    "p95_latency_ms": 0.0,
+    "p99_latency_ms": 1.010143756866455,
+    "min_latency_ms": 0.0,
+    "max_latency_ms": 14.197587966918945,
+    "target_ms": 10,
+    "meets_target": true
+  },
+  {
+    "component": "Session Manager",
+    "iterations": 20000,
+    "create_operations": 10000,
+    "get_operations": 10000,
+    "mean_latency_ms": 0.0016870856285095214,
+    "median_latency_ms": 0.0,
+    "p95_latency_ms": 0.0,
+    "p99_latency_ms": 0.0,
+    "min_latency_ms": 0.0,
+    "max_latency_ms": 13.862133026123047,
+    "target_ms": 1,
+    "meets_target": true
+  },
+  {
+    "component": "Rate Limiter",
+    "iterations": 10000,
+    "mean_latency_ms": 0.0037514209747314454,
+    "median_latency_ms": 0.0,
+    "p95_latency_ms": 0.0,
+    "p99_latency_ms": 0.0,
+    "min_latency_ms": 0.0,
+    "max_latency_ms": 2.981424331665039,
+    "target_ms": 1,
+    "meets_target": true
+  }
+]

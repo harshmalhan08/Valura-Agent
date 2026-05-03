@@ -1,0 +1,67 @@
+================================================================================
+VALURA AI - OFFLINE PERFORMANCE REPORT
+================================================================================
+Date: 2026-05-03 22:56:02
+
+NOTE: This report measures components that don't require API calls.
+For full end-to-end performance, run with valid API keys.
+
+--------------------------------------------------------------------------------
+Component: Safety Guard
+--------------------------------------------------------------------------------
+Iterations: 2000
+Safe Queries: 1000
+Harmful Queries: 1000
+
+Latency Metrics:
+  Mean:   0.055 ms
+  Median: 0.000 ms
+  p95:    0.000 ms
+  p99:    1.010 ms
+  Min:    0.000 ms
+  Max:    14.198 ms
+  Target: 10 ms
+  Status: ✅ PASS
+
+--------------------------------------------------------------------------------
+Component: Session Manager
+--------------------------------------------------------------------------------
+Iterations: 20000
+Create Operations: 10000
+Get Operations: 10000
+
+Latency Metrics:
+  Mean:   0.002 ms
+  Median: 0.000 ms
+  p95:    0.000 ms
+  p99:    0.000 ms
+  Min:    0.000 ms
+  Max:    13.862 ms
+  Target: 1 ms
+  Status: ✅ PASS
+
+--------------------------------------------------------------------------------
+Component: Rate Limiter
+--------------------------------------------------------------------------------
+Iterations: 10000
+
+Latency Metrics:
+  Mean:   0.004 ms
+  Median: 0.000 ms
+  p95:    0.000 ms
+  p99:    0.000 ms
+  Min:    0.000 ms
+  Max:    2.981 ms
+  Target: 1 ms
+  Status: ✅ PASS
+
+================================================================================
+SUMMARY
+================================================================================
+✅ ALL PERFORMANCE TARGETS MET!
+
+Key Findings:
+  ✅ Safety Guard: 0.000ms (target: 10ms)
+  ✅ Session Manager: 0.000ms (target: 1ms)
+  ✅ Rate Limiter: 0.000ms (target: 1ms)
+================================================================================

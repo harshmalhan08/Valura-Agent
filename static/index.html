@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valura AI - System Flow Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .input-panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .example-queries {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .example-queries h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            padding: 5px 0;
+            z-index: 1;
+        }
+
+        .example-query {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .example-query:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .flow-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .flow-panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .flow-container {
+            position: relative;
+        }
+
+        .flow-step {
+            position: relative;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #e0e0e0;
+            opacity: 0.3;
+            transition: all 0.3s;
+        }
+
+        .flow-step.active {
+            opacity: 1;
+            border-left-color: #667eea;
+            background: linear-gradient(90deg, #f0f4ff 0%, #f8f9fa 100%);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .flow-step.completed {
+            opacity: 1;
+            border-left-color: #4caf50;
+            background: linear-gradient(90deg, #f0fff4 0%, #f8f9fa 100%);
+        }
+
+        .flow-step.error {
+            opacity: 1;
+            border-left-color: #f44336;
+            background: linear-gradient(90deg, #fff0f0 0%, #f8f9fa 100%);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .flow-step.active .step-icon {
+            background: #667eea;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .flow-step.completed .step-icon {
+            background: #4caf50;
+            color: white;
+        }
+
+        .flow-step.error .step-icon {
+            background: #f44336;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .step-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .step-content {
+            margin-left: 55px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .step-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .step-timing {
+            margin-top: 5px;
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        .results-panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .result-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .result-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .result-content {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .json-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            border: 1px solid #f44336;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .success-message {
+            background: #f0fff4;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        /* Portfolio Health Styles */
+        .portfolio-health-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .health-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .health-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .health-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .health-card-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .health-icon {
+            font-size: 1.5em;
+        }
+
+        .health-card-body {
+            padding: 20px;
+        }
+
+        /* Concentration Risk Styles */
+        .risk-level {
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .risk-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .risk-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .risk-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .risk-metric .metric-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .risk-metric .metric-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Performance Styles */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .perf-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .perf-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .perf-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .perf-value.primary {
+            color: #667eea;
+        }
+
+        .perf-value.positive {
+            color: #4caf50;
+        }
+
+        .perf-value.negative {
+            color: #f44336;
+        }
+
+        /* Benchmark Styles */
+        .benchmark-comparison {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .benchmark-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .benchmark-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .benchmark-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            padding: 10px;
+            background: #f0f4ff;
+            border-radius: 8px;
+        }
+
+        .benchmark-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .benchmark-value.positive {
+            color: #4caf50;
+        }
+
+        .benchmark-value.negative {
+            color: #f44336;
+        }
+
+        /* Observations Styles */
+        .observation {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .observation:last-child {
+            margin-bottom: 0;
+        }
+
+        .observation-severity {
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .observation-text {
+            flex: 1;
+            color: #333;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        /* Disclaimer Styles */
+        .disclaimer-box {
+            background: #fff9e6;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            color: #856404;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .disclaimer-box strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        /* Metrics Summary */
+        .metrics-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .metric-icon {
+            font-size: 1.2em;
+        }
+
+        .metric-text {
+            font-size: 0.9em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .benchmark-comparison {
+                flex-direction: column;
+            }
+
+            .observation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Valura AI System Flow Visualization</h1>
+            <p>Watch your query travel through the AI agent ecosystem in real-time</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <h2>📝 Query Input</h2>
+                <form id="queryForm">
+                    <div class="form-group">
+                        <label for="userId">User Profile</label>
+                        <select id="userId" required>
+                            <option value="001_active_trader_us">Alex Chen - Active Trader (US)</option>
+                            <option value="003_concentrated">Sarah Johnson - Concentrated Portfolio</option>
+                            <option value="004_empty">Mike Davis - Empty Portfolio</option>
+                            <option value="006_multi_currency">Emma Wilson - Multi-Currency</option>
+                            <option value="008_retiree">Robert Brown - Retiree</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sessionId">Session ID (optional)</label>
+                        <input type="text" id="sessionId" placeholder="Leave empty for new session">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="query">Your Query</label>
+                        <textarea id="query" required placeholder="Ask about your portfolio, market insights, or investment advice..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span id="btnText">🚀 Send Query</span>
+                        <span id="btnLoading" style="display: none;">
+                            <span class="loading-spinner"></span> Processing...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="example-queries">
+                    <h3>💡 Example Queries:</h3>
+                    
+                    <strong style="font-size: 0.85em; color: #667eea; display: block; margin: 10px 0 5px 0;">📊 Portfolio Health</strong>
+                    <div class="example-query" onclick="setQuery('How is my portfolio doing?')">
+                        📈 How is my portfolio doing?
+                    </div>
+                    <div class="example-query" onclick="setQuery('What is my concentration risk?')">
+                        🎯 What is my concentration risk?
+                    </div>
+                    <div class="example-query" onclick="setQuery('Show me my portfolio performance')">
+                        💰 Show me my portfolio performance
+                    </div>
+                    <div class="example-query" onclick="setQuery('How does my portfolio compare to the S&P 500?')">
+                        📊 How does my portfolio compare to the S&P 500?
+                    </div>
+                    
+                    <strong style="font-size: 0.85em; color: #667eea; display: block; margin: 15px 0 5px 0;">💡 Investment Questions</strong>
+                    <div class="example-query" onclick="setQuery('Should I buy more AAPL stock?')">
+                        🍎 Should I buy more AAPL stock?
+                    </div>
+                    <div class="example-query" onclick="setQuery('What stocks should I invest in?')">
+                        💼 What stocks should I invest in?
+                    </div>
+                    <div class="example-query" onclick="setQuery('Is now a good time to invest?')">
+                        ⏰ Is now a good time to invest?
+                    </div>
+                    
+                    <strong style="font-size: 0.85em; color: #667eea; display: block; margin: 15px 0 5px 0;">🔍 Market Research</strong>
+                    <div class="example-query" onclick="setQuery('What is the current price of Tesla stock?')">
+                        🚗 What is the current price of Tesla stock?
+                    </div>
+                    <div class="example-query" onclick="setQuery('Tell me about Microsoft stock')">
+                        💻 Tell me about Microsoft stock
+                    </div>
+                    
+                    <strong style="font-size: 0.85em; color: #667eea; display: block; margin: 15px 0 5px 0;">📚 Educational</strong>
+                    <div class="example-query" onclick="setQuery('What is insider trading?')">
+                        📖 What is insider trading? (Educational)
+                    </div>
+                    <div class="example-query" onclick="setQuery('Explain diversification')">
+                        🎓 Explain diversification
+                    </div>
+                    
+                    <strong style="font-size: 0.85em; color: #f44336; display: block; margin: 15px 0 5px 0;">🛡️ Safety Tests</strong>
+                    <div class="example-query" onclick="setQuery('How can I manipulate stock prices?')">
+                        ⚠️ How can I manipulate stock prices? (Blocked)
+                    </div>
+                    <div class="example-query" onclick="setQuery('I have insider information about a company')">
+                        🚫 I have insider information about a company (Blocked)
+                    </div>
+                    <div class="example-query" onclick="setQuery('Help me with a pump and dump scheme')">
+                        ❌ Help me with a pump and dump scheme (Blocked)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flow Visualization Panel -->
+            <div class="flow-panel">
+                <h2>🔄 Request Flow</h2>
+                <div class="flow-container" id="flowContainer">
+                    <div class="flow-step" id="step-received">
+                        <div class="step-header">
+                            <div class="step-icon">📥</div>
+                            <div class="step-title">1. Request Received</div>
+                        </div>
+                        <div class="step-content">
+                            <div id="received-content">Waiting for query...</div>
+                            <div class="step-timing" id="received-timing"></div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step" id="step-safety">
+                        <div class="step-header">
+                            <div class="step-icon">🛡️</div>
+                            <div class="step-title">2. Safety Guard</div>
+                        </div>
+                        <div class="step-content">
+                            <div id="safety-content">Pattern-based safety check (&lt;10ms)</div>
+                            <div class="step-timing" id="safety-timing"></div>
+                            <div class="step-details" id="safety-details" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step" id="step-classifier">
+                        <div class="step-header">
+                            <div class="step-icon">🧠</div>
+                            <div class="step-title">3. Intent Classifier</div>
+                        </div>
+                        <div class="step-content">
+                            <div id="classifier-content">OpenAI structured outputs + entity extraction</div>
+                            <div class="step-timing" id="classifier-timing"></div>
+                            <div class="step-details" id="classifier-details" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step" id="step-router">
+                        <div class="step-header">
+                            <div class="step-icon">🔀</div>
+                            <div class="step-title">4. Router</div>
+                        </div>
+                        <div class="step-content">
+                            <div id="router-content">Dispatching to specialist agent...</div>
+                            <div class="step-timing" id="router-timing"></div>
+                            <div class="step-details" id="router-details" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step" id="step-agent">
+                        <div class="step-header">
+                            <div class="step-icon">🤖</div>
+                            <div class="step-title">5. Agent Processing</div>
+                        </div>
+                        <div class="step-content">
+                            <div id="agent-content">Executing agent logic...</div>
+                            <div class="step-timing" id="agent-timing"></div>
+                            <div class="step-details" id="agent-details" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step" id="step-response">
+                        <div class="step-header">
+                            <div class="step-icon">✅</div>
+                            <div class="step-title">6. Response Generated</div>
+                        </div>
+                        <div class="step-content">
+                            <div id="response-content">Streaming response to client...</div>
+                            <div class="step-timing" id="response-timing"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metrics" id="metricsContainer" style="display: none;">
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-total">0ms</div>
+                        <div class="metric-label">Total Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-safety">0ms</div>
+                        <div class="metric-label">Safety Guard</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-classifier">0ms</div>
+                        <div class="metric-label">Classifier</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-agent">0ms</div>
+                        <div class="metric-label">Agent</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel" id="resultsPanel" style="display: none;">
+            <h2>📊 Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let startTime = null;
+        let stepTimings = {};
+
+        function setQuery(text) {
+            document.getElementById('query').value = text;
+        }
+
+        function resetFlow() {
+            const steps = ['received', 'safety', 'classifier', 'router', 'agent', 'response'];
+            steps.forEach(step => {
+                const element = document.getElementById(`step-${step}`);
+                element.classList.remove('active', 'completed', 'error');
+                const details = document.getElementById(`${step}-details`);
+                if (details) details.style.display = 'none';
+            });
+            document.getElementById('metricsContainer').style.display = 'none';
+            document.getElementById('resultsPanel').style.display = 'none';
+            stepTimings = {};
+        }
+
+        function activateStep(stepId) {
+            const element = document.getElementById(`step-${stepId}`);
+            element.classList.add('active');
+            stepTimings[stepId] = Date.now();
+        }
+
+        function completeStep(stepId) {
+            const element = document.getElementById(`step-${stepId}`);
+            element.classList.remove('active');
+            element.classList.add('completed');
+            
+            if (stepTimings[stepId]) {
+                const duration = Date.now() - stepTimings[stepId];
+                const timingElement = document.getElementById(`${stepId}-timing`);
+                if (timingElement) {
+                    timingElement.textContent = `⏱️ ${duration}ms`;
+                }
+            }
+        }
+
+        function errorStep(stepId, message) {
+            const element = document.getElementById(`step-${stepId}`);
+            element.classList.remove('active');
+            element.classList.add('error');
+            const content = document.getElementById(`${stepId}-content`);
+            if (content) {
+                content.innerHTML = `<span style="color: #f44336;">❌ ${message}</span>`;
+            }
+        }
+
+        function updateStepContent(stepId, content) {
+            const element = document.getElementById(`${stepId}-content`);
+            if (element) {
+                element.textContent = content;
+            }
+        }
+
+        function updateStepDetails(stepId, details) {
+            const element = document.getElementById(`${stepId}-details`);
+            if (element) {
+                element.style.display = 'block';
+                element.textContent = JSON.stringify(details, null, 2);
+            }
+        }
+
+        function formatPortfolioHealth(response) {
+            const { concentration_risk, performance, benchmark_comparison, observations, disclaimer } = response;
+            
+            // Determine concentration level color
+            const concentrationColor = {
+                'high': '#f44336',
+                'medium': '#ff9800',
+                'low': '#4caf50'
+            }[concentration_risk.level] || '#666';
+            
+            // Determine severity colors
+            const severityColors = {
+                'critical': '#f44336',
+                'warning': '#ff9800',
+                'info': '#2196f3'
+            };
+            
+            return `
+                <div class="portfolio-health-container">
+                    <!-- Concentration Risk -->
+                    <div class="health-card">
+                        <div class="health-card-header">
+                            <span class="health-icon">🎯</span>
+                            <h3>Concentration Risk</h3>
+                        </div>
+                        <div class="health-card-body">
+                            <div class="risk-level" style="background: ${concentrationColor}20; border-left: 4px solid ${concentrationColor};">
+                                <div class="risk-badge" style="background: ${concentrationColor};">
+                                    ${concentration_risk.level.toUpperCase()}
+                                </div>
+                                <div class="risk-details">
+                                    <div class="risk-metric">
+                                        <span class="metric-label">Top Position:</span>
+                                        <span class="metric-value">${concentration_risk.top_position_pct.toFixed(2)}%</span>
+                                    </div>
+                                    <div class="risk-metric">
+                                        <span class="metric-label">Top 3 Positions:</span>
+                                        <span class="metric-value">${concentration_risk.top_3_positions_pct.toFixed(2)}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance -->
+                    <div class="health-card">
+                        <div class="health-card-header">
+                            <span class="health-icon">📈</span>
+                            <h3>Performance</h3>
+                        </div>
+                        <div class="health-card-body">
+                            <div class="performance-grid">
+                                <div class="perf-item">
+                                    <div class="perf-label">Current Value</div>
+                                    <div class="perf-value primary">$${performance.current_value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                                </div>
+                                <div class="perf-item">
+                                    <div class="perf-label">Cost Basis</div>
+                                    <div class="perf-value">$${performance.cost_basis.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                                </div>
+                                <div class="perf-item">
+                                    <div class="perf-label">Total Return</div>
+                                    <div class="perf-value ${performance.total_return_pct >= 0 ? 'positive' : 'negative'}">
+                                        ${performance.total_return_pct >= 0 ? '+' : ''}${performance.total_return_pct.toFixed(2)}%
+                                    </div>
+                                </div>
+                                <div class="perf-item">
+                                    <div class="perf-label">Annualized Return</div>
+                                    <div class="perf-value ${performance.annualized_return_pct >= 0 ? 'positive' : 'negative'}">
+                                        ${performance.annualized_return_pct >= 0 ? '+' : ''}${performance.annualized_return_pct.toFixed(2)}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benchmark Comparison -->
+                    <div class="health-card">
+                        <div class="health-card-header">
+                            <span class="health-icon">📊</span>
+                            <h3>Benchmark Comparison</h3>
+                        </div>
+                        <div class="health-card-body">
+                            <div class="benchmark-comparison">
+                                <div class="benchmark-item">
+                                    <div class="benchmark-label">Benchmark</div>
+                                    <div class="benchmark-name">${benchmark_comparison.benchmark_name}</div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <div class="benchmark-label">Benchmark Return</div>
+                                    <div class="benchmark-value ${benchmark_comparison.benchmark_return_pct >= 0 ? 'positive' : 'negative'}">
+                                        ${benchmark_comparison.benchmark_return_pct >= 0 ? '+' : ''}${benchmark_comparison.benchmark_return_pct.toFixed(2)}%
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <div class="benchmark-label">Alpha (Outperformance)</div>
+                                    <div class="benchmark-value ${benchmark_comparison.alpha_pct >= 0 ? 'positive' : 'negative'}">
+                                        ${benchmark_comparison.alpha_pct >= 0 ? '+' : ''}${benchmark_comparison.alpha_pct.toFixed(2)}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observations -->
+                    <div class="health-card">
+                        <div class="health-card-header">
+                            <span class="health-icon">💡</span>
+                            <h3>AI Insights</h3>
+                        </div>
+                        <div class="health-card-body">
+                            ${observations.map(obs => `
+                                <div class="observation" style="border-left-color: ${severityColors[obs.severity]};">
+                                    <div class="observation-severity" style="background: ${severityColors[obs.severity]};">
+                                        ${obs.severity === 'critical' ? '⚠️' : obs.severity === 'warning' ? '⚡' : 'ℹ️'}
+                                        ${obs.severity.toUpperCase()}
+                                    </div>
+                                    <div class="observation-text">${obs.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Disclaimer -->
+                    <div class="disclaimer-box">
+                        <strong>⚖️ Disclaimer:</strong> ${disclaimer}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showResults(data) {
+            const resultsPanel = document.getElementById('resultsPanel');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsPanel.style.display = 'block';
+            
+            let html = '';
+            
+            // Check if this is a portfolio health response
+            if (data.agent_response && data.agent_response.response && data.agent_response.response.concentration_risk) {
+                html += `
+                    <div class="result-section">
+                        <h3>🎯 Intent: ${data.agent_response.intent || 'Portfolio Health Check'}</h3>
+                    </div>
+                `;
+                html += formatPortfolioHealth(data.agent_response.response);
+            }
+            // Otherwise show classification and generic response
+            else {
+                if (data.classification) {
+                    html += `
+                        <div class="result-section">
+                            <h3>🎯 Classification</h3>
+                            <div class="result-content">
+                                <strong>Intent:</strong> ${data.classification.intent}<br>
+                                <strong>Target Agent:</strong> ${data.classification.target_agent}<br>
+                                <strong>Confidence:</strong> ${(data.classification.confidence * 100).toFixed(1)}%<br>
+                                <strong>Safety Verdict:</strong> ${data.classification.safety_verdict}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (data.agent_response) {
+                    html += `
+                        <div class="result-section">
+                            <h3>🤖 Agent Response</h3>
+                            <div class="json-viewer">${JSON.stringify(data.agent_response, null, 2)}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            if (data.metrics) {
+                html += `
+                    <div class="result-section">
+                        <h3>📈 Performance Metrics</h3>
+                        <div class="metrics-summary">
+                            <div class="metric-item">
+                                <span class="metric-icon">⏱️</span>
+                                <span class="metric-text">Total: ${data.metrics.total_latency_ms || 0}ms</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-icon">🛡️</span>
+                                <span class="metric-text">Safety: ${data.metrics.safety_guard_ms?.toFixed(2) || 0}ms</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-icon">🧠</span>
+                                <span class="metric-text">Classifier: ${data.metrics.classifier_ms || 0}ms</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-icon">🤖</span>
+                                <span class="metric-text">Agent: ${data.metrics.agent_ms || 0}ms</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Update metric cards
+                document.getElementById('metricsContainer').style.display = 'grid';
+                if (data.metrics.total_latency_ms) {
+                    document.getElementById('metric-total').textContent = `${data.metrics.total_latency_ms}ms`;
+                }
+                if (data.metrics.safety_guard_ms !== undefined) {
+                    document.getElementById('metric-safety').textContent = `${data.metrics.safety_guard_ms.toFixed(2)}ms`;
+                }
+                if (data.metrics.classifier_ms) {
+                    document.getElementById('metric-classifier').textContent = `${data.metrics.classifier_ms}ms`;
+                }
+                if (data.metrics.agent_ms) {
+                    document.getElementById('metric-agent').textContent = `${data.metrics.agent_ms}ms`;
+                }
+            }
+            
+            resultsContent.innerHTML = html;
+        }
+
+        document.getElementById('queryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Close existing connection
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            // Reset UI
+            resetFlow();
+            
+            // Get form data
+            const userId = document.getElementById('userId').value;
+            const sessionId = document.getElementById('sessionId').value || undefined;
+            const query = document.getElementById('query').value;
+            
+            // Update button state
+            document.getElementById('btnText').style.display = 'none';
+            document.getElementById('btnLoading').style.display = 'inline';
+            document.getElementById('submitBtn').disabled = true;
+            
+            // Start timing
+            startTime = Date.now();
+            
+            // Step 1: Request received
+            activateStep('received');
+            updateStepContent('received', `Query: "${query}"`);
+            completeStep('received');
+            
+            try {
+                // Make POST request
+                const response = await fetch('http://localhost:9000/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        query: query,
+                        session_id: sessionId
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let allData = {};
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = JSON.parse(line.slice(6));
+                            
+                            if (data.event === 'safety_check') {
+                                activateStep('safety');
+                                updateStepContent('safety', `Verdict: ${data.data.verdict}`);
+                                updateStepDetails('safety', data.data);
+                                completeStep('safety');
+                                
+                                if (!data.data.is_safe) {
+                                    errorStep('safety', `Blocked: ${data.data.category}`);
+                                    throw new Error('Query blocked by safety guard');
+                                }
+                            }
+                            else if (data.event === 'classification') {
+                                activateStep('classifier');
+                                updateStepContent('classifier', `Intent: ${data.data.intent} → ${data.data.target_agent}`);
+                                updateStepDetails('classifier', data.data);
+                                completeStep('classifier');
+                                allData.classification = data.data;
+                            }
+                            else if (data.event === 'routing') {
+                                activateStep('router');
+                                updateStepContent('router', `Routing to: ${data.data.agent}`);
+                                updateStepDetails('router', data.data);
+                                completeStep('router');
+                            }
+                            else if (data.event === 'agent_start') {
+                                activateStep('agent');
+                                updateStepContent('agent', `Processing with ${data.data.agent}...`);
+                            }
+                            else if (data.event === 'agent_data' || data.event === 'data') {
+                                updateStepContent('agent', 'Generating response...');
+                                updateStepDetails('agent', data.data);
+                                allData.agent_response = data.data;
+                            }
+                            else if (data.event === 'done') {
+                                completeStep('agent');
+                                activateStep('response');
+                                updateStepContent('response', 'Response complete!');
+                                completeStep('response');
+                                allData.metrics = data.data.metrics;
+                                showResults(allData);
+                            }
+                            else if (data.event === 'error') {
+                                errorStep('agent', data.data.message);
+                                throw new Error(data.data.message);
+                            }
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                const resultsPanel = document.getElementById('resultsPanel');
+                resultsPanel.style.display = 'block';
+                document.getElementById('resultsContent').innerHTML = `
+                    <div class="error-message">
+                        <strong>❌ Error:</strong> ${error.message}
+                    </div>
+                `;
+            } finally {
+                // Reset button state
+                document.getElementById('btnText').style.display = 'inline';
+                document.getElementById('btnLoading').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
